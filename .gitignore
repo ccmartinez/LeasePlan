@@ -1,0 +1,6 @@
+/.forceignore
+/.sfdx
+/config
+/force-app
+/manifest
+/sfdx-project.json
