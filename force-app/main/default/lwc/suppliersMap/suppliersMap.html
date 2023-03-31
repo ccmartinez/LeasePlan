@@ -1,19 +1,19 @@
 <template>
-    <div class="slds-box" >
-        <h2 class="slds-text-heading_medium slds-var-m-bottom_medium">
-            Suppplier Map
-        </h2>
-        <div class="mainPanel">
-            <div role="status" class="slds-spinner slds-spinner_medium" lwc:if={showSpinner}>
-                <span class="slds-assistive-text">Loading</span>
-                <div class="slds-spinner__dot-a"></div>
-                <div class="slds-spinner__dot-b"></div>
-              </div>
-            <div lwc:else>
-                <lightning-map 
-                    map-markers={suppliersMarkers} 
-                ></lightning-map>
+    <h2 class="slds-text-heading_medium slds-var-m-bottom_medium">
+        Supplier Map <lightning-button variant="brand" label="Show supplier list" title="Show supplier list" onclick={toggleSuppliersVisibility} class="slds-m-left_x-small" lwc:if={showSupplierListButton}
+        ></lightning-button>
+    </h2>
+        <div role="status" class="slds-spinner slds-spinner_medium" lwc:if={showSpinner}>
+            <span class="slds-assistive-text">Loading</span>
+            <div class="slds-spinner__dot-a"></div>
+            <div class="slds-spinner__dot-b"></div>
             </div>
+        <div lwc:else>
+            <lightning-map 
+                map-markers={suppliersMarkers} 
+                center={center}
+                list-view={supplierListVisibility}
+                onmarkerselect={toggleSuppliersVisibility}
+            ></lightning-map>
         </div>
-    </div>
 </template>

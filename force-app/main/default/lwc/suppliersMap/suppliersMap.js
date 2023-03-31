@@ -10,6 +10,8 @@ export default class SuppliersMap extends LightningElement {
     }
     @track suppliersMarkers = [];
     @track showSpinner = true;
+    @track supplierListVisibility = "hidden";
+    @track showSupplierListButton = true;
 
     get recordId() {
         return this._recordId;
@@ -27,9 +29,21 @@ export default class SuppliersMap extends LightningElement {
                         Longitude: parseFloat(resultLocation.lng)
                     }
                 })
-                this.showSpinner = false;
-            })
-            let test = 1;
+            });
+
+            this.center  = this.suppliersMarkers[0];
+            this.showSpinner = false;
         });
+    }
+
+    toggleSuppliersVisibility(){
+        if(this.supplierListVisibility == 'hidden'){
+            this.supplierListVisibility = 'visible';
+            this.showSupplierListButton = false;
+        }
+        else{
+            this.supplierListVisibility = 'hidden'
+            this.showSupplierListButton = true;
+        }
     }
 }
