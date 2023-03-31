@@ -41,7 +41,7 @@ public with sharing class CitiesProcessor implements Schedulable{
 
     public static void scheduleNextBatch(Set<String> citiesToProcess){
         if(!citiesToProcess.isEmpty()){
-            Datetime inAMinute = Datetime.now().addSeconds(5); //TODO: Review this
+            Datetime inAMinute = Datetime.now().addMinutes(1);//TODO: move this into metadata
             String cron = inAMinute.second() + ' ' + inAMinute.minute() +' '+ inAMinute.hour() +' ' + inAMinute.day() + ' ' + inAMinute.month() + ' ? ' + inAMinute.year();
             System.schedule('cities processor execution seed: ' + inAMinute.getTime(), cron, new CitiesProcessor(citiesToProcess));
         }
