@@ -10,8 +10,12 @@ export default class SuppliersMap extends LightningElement {
     }
     @track suppliersMarkers = [];
     @track showSpinner = true;
+    @track showError = false;
     @track supplierListVisibility = "hidden";
-    @track showSupplierListButton = true;
+    @track showSupplierListButton = false;
+    @track errorCode;
+    @track errorCodePopulated = false;
+    @track errorMessage;
 
     get recordId() {
         return this._recordId;
@@ -20,20 +24,25 @@ export default class SuppliersMap extends LightningElement {
     retreiveData(){
         debugger;
         getSuppliersData({accountId: this.recordId}).then(response => {
-            response.results.forEach(result => {
-                let resultLocation = result.geometry.location;
-                this.suppliersMarkers.push({
-                    title: result.name,
-                    location: {
-                        Latitude: parseFloat(resultLocation.lat),
-                        Longitude: parseFloat(resultLocation.lng)
-                    }
-                })
-            });
+            try{
+                response.results.forEach(result => {
+                    let resultLocation = result.geometry.location;
+                    this.suppliersMarkers.push({
+                        title: result.name,
+                        location: {
+                            Latitude: parseFloat(resultLocation.lat),
+                            Longitude: parseFloat(resultLocation.lng)
+                        }
+                    })
+                });
 
-            this.center  = this.suppliersMarkers[0];
-            this.showSpinner = false;
-        });
+                this.center  = this.suppliersMarkers[0];
+                this.showSpinner = false;
+                this.showSupplierListButton = true;
+            }catch(error){
+                this.processError(error)
+            }
+        }).catch(error => this.processError(error));;
     }
 
     toggleSuppliersVisibility(){
@@ -45,5 +54,18 @@ export default class SuppliersMap extends LightningElement {
             this.supplierListVisibility = 'hidden'
             this.showSupplierListButton = true;
         }
+    }
+
+    processError(error){
+        this.showError = true;
+        if(error.status == null){
+            this.errorMessage = error.message;    
+        }
+        else{
+            this.errorMessage = error.statusText;
+            this.setErrorCode(error.status);
+        }
+
+        this.showSpinner = false;
     }
 }
