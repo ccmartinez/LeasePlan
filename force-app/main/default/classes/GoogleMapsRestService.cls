@@ -20,11 +20,15 @@ public with sharing class GoogleMapsRestService {
             response.coordinatesAlreadyPresentInResultList = new Set<String>();
         }
 
+        System.debug('result token:' + response.next_page_token);
         for(GoogleResult result: results){
             Location resultLocation = result.geometry.location;
             String resultCoordinates = resultLocation.getCoordinates();
+            System.debug('result coordinates:' + resultCoordinates);
             if(!response.coordinatesAlreadyPresentInResultList.contains(resultCoordinates)){
+                System.debug('new coordinates');
                 response.coordinatesAlreadyPresentInResultList.add(resultCoordinates);
+                System.debug('name to add:' + result.name);
                 response.results.add(result);
             }
         }
@@ -66,7 +70,7 @@ public with sharing class GoogleMapsRestService {
         response.coordinatesAlreadyPresentInResultList = new Set<String>();
         
         for(GoogleResult result: response.results){
-            response.coordinatesAlreadyPresentInResultList.add(result.name);
+            response.coordinatesAlreadyPresentInResultList.add(result.geometry.location.getCoordinates());
         }
 
         for(Integer i = 0; i < GOOGLE_PAGE_NUMBER; i++){
@@ -97,9 +101,6 @@ public with sharing class GoogleMapsRestService {
         String response = new Http().send(req).getBody();
         GoogleResponse parsedResponse = (GoogleResponse)JSON.deserialize(response, GoogleResponse.class);
 
-        for(GoogleResult result: parsedResponse.results){
-            System.debug('result name:' + result.name);
-        }
         return parsedResponse;
     }
 
@@ -110,7 +111,7 @@ public with sharing class GoogleMapsRestService {
         public GoogleResult[] results;
         private Location minLatLocation, maxLatLocation, minLongLocation, maxLongLocation;
 
-        public GoogleResponse(Supplier__c[] supplierList){//TODO: Populate this
+        public GoogleResponse(Supplier__c[] supplierList){
             results = new GoogleResult[0];
             for(Supplier__c supplier: supplierList){
                 GoogleResult resultToAdd = new GoogleResult();
@@ -119,6 +120,7 @@ public with sharing class GoogleMapsRestService {
                 resultToAdd.geometry.location.lat = supplier.Location__Latitude__s;
                 resultToAdd.geometry.location.lng = supplier.Location__Longitude__s;
                 resultToAdd.name = supplier.Name;
+                System.debug('name to add:' + resultToAdd.name);
                 results.add(resultToAdd);
             }
         }

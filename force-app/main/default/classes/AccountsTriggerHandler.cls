@@ -21,15 +21,7 @@ public with sharing class AccountsTriggerHandler extends fflib_SObjectDomain{
     private Set<String> getChangedAccountCitiesThatDontHaveASupplier(Map<Id, SObject> oldMap){
         Set<String> changedAccountCitiesThatMayHaveASupplier = new Set<String>();
         for(Account acc: (Account[])Trigger.new){
-            String oldBillingCity;
-
-            if(oldMap != null){
-                Account oldAcc = (Account)oldMap.get(acc.Id);
-                oldBillingCity = oldAcc.BillingCity;
-            }
-            if(acc.BillingCity != null && 
-                (oldBillingCity == null || acc.BillingCity != oldBillingCity) 
-            ){
+            if(acc.BillingCity != null){
                 changedAccountCitiesThatMayHaveASupplier.add(acc.BillingCity);
             }
         }
