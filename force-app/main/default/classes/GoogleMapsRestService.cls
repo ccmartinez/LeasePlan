@@ -47,7 +47,8 @@ public with sharing class GoogleMapsRestService {
         String locationCoordinates = location.getCoordinates();
         if(!currentResponse.coordinatesAlreadyUsedInASearch.contains(locationCoordinates)){
             currentResponse.coordinatesAlreadyUsedInASearch.add(locationCoordinates);
-            addNonDuplicateResultsToResponse(currentResponse, getSuppliersBasedOnALocation(location).results);
+            GoogleResponse suppliersBasedOnALocation = getSuppliersBasedOnALocation(location);
+            addNonDuplicateResultsToResponse(currentResponse, suppliersBasedOnALocation.results);
         }
     }
 
@@ -109,10 +110,6 @@ public with sharing class GoogleMapsRestService {
         public GoogleResult[] results;
         private Location minLatLocation, maxLatLocation, minLongLocation, maxLongLocation;
 
-        public Supplier__c createSupplier(){//TODO: populate this
-            return new Supplier__c();
-        }
-
         public void updateCoordinates(){
             for(GoogleResult result: results){
                 Location resultLocation = result.geometry.location;
@@ -142,6 +139,20 @@ public with sharing class GoogleMapsRestService {
         public CityCode plusCode;
         @AuraEnabled
         public Geometry geometry;
+
+        public Supplier__c createSupplier(String cityName){
+            System.debug('CITY:' + cityName);
+            if(name.length() > 80){
+                name = name.substring(0, 80);
+            }
+            
+            return new Supplier__c(
+                Name = name,
+                Location__City__s = cityName,
+                Location__Latitude__s = geometry.location.lat,
+                Location__Longitude__s = geometry.location.lng
+            );
+        }
     }
 
     public class Geometry{
