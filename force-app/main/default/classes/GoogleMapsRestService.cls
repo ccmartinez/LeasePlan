@@ -110,6 +110,19 @@ public with sharing class GoogleMapsRestService {
         public GoogleResult[] results;
         private Location minLatLocation, maxLatLocation, minLongLocation, maxLongLocation;
 
+        public GoogleResponse(Supplier__c[] supplierList){//TODO: Populate this
+            results = new GoogleResult[0];
+            for(Supplier__c supplier: supplierList){
+                GoogleResult resultToAdd = new GoogleResult();
+                resultToAdd.geometry = new Geometry();
+                resultToAdd.geometry.location = new Location();
+                resultToAdd.geometry.location.lat = supplier.Location__Latitude__s;
+                resultToAdd.geometry.location.lng = supplier.Location__Longitude__s;
+                resultToAdd.name = supplier.Name;
+                results.add(resultToAdd);
+            }
+        }
+
         public void updateCoordinates(){
             for(GoogleResult result: results){
                 Location resultLocation = result.geometry.location;
@@ -145,7 +158,7 @@ public with sharing class GoogleMapsRestService {
             if(name.length() > 80){
                 name = name.substring(0, 80);
             }
-            
+
             return new Supplier__c(
                 Name = name,
                 Location__City__s = cityName,
