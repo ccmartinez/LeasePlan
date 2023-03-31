@@ -7,7 +7,6 @@ export default class SuppliersMap extends LightningElement {
     @api set recordId(value) {
         this._recordId = value;
         this.retreiveData();
-        // do your thing right here with this.recordId / value
     }
     @track suppliersMarkers = [];
     @track showSpinner = true;
