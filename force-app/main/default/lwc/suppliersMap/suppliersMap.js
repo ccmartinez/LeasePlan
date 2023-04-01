@@ -32,7 +32,8 @@ export default class SuppliersMap extends LightningElement {
                         location: {
                             Latitude: parseFloat(resultLocation.lat),
                             Longitude: parseFloat(resultLocation.lng)
-                        }
+                        },
+                        description: resultLocation.lat + ', ' + resultLocation.lng
                     })
                 });
 
