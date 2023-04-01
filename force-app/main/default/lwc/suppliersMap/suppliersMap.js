@@ -43,7 +43,7 @@ export default class SuppliersMap extends LightningElement {
             }catch(error){
                 this.processError(error)
             }
-        }).catch(error => this.processError(error));;
+        }).catch(error => this.processError(error));
     }
 
     enableSuppliersVisibility(){

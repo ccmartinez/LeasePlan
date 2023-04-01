@@ -4,11 +4,11 @@ public with sharing class AccountsTriggerHandler extends fflib_SObjectDomain{
     }
 
     public override void onAfterInsert() {
-        new AccountsService().processAccountCities(null);
+        new AccountsService().processAccountCities();
     }
 
     public override void onAfterUpdate(Map<Id, SObject> oldMap) {
-        new AccountsService().processAccountCities(oldMap);
+        new AccountsService().processAccountCities();
     }
 
     public class Constructor implements fflib_SObjectDomain.IConstructable

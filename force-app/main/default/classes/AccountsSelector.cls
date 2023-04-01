@@ -14,4 +14,8 @@ public with sharing class AccountsSelector extends fflib_SObjectSelector{
     public Account[] selectById(Set<Id> accountIdSet){
         return selectSObjectsById(accountIdSet);
     }
+
+    public Account[] getAccountsUsedForThreadSync(){
+        return Database.query('SELECT Id FROM Account LIMIT 1 FOR UPDATE');
+    }
 }
