@@ -1,16 +1,11 @@
-public with sharing class CitiesProcessor implements Schedulable{
+public with sharing class CitiesProcessor implements Queueable, Database.AllowsCallouts{
     Set<String> citiesToProcess;
     private static final Integer BATCH_SIZE = 5; //number of records to process in a single execution
 
     public CitiesProcessor(Set<String> citiesToProcess){
         this.citiesToProcess = citiesToProcess;
     }
-    public void execute(SchedulableContext SC) {//TODO: test this with different scheduling times
-        processCities(citiesToProcess);
-    }
-
-    @future(callout=true)
-    public static void processCities(Set<String> citiesToProcess){
+    public void execute(QueueableContext qc) {//TODO: test this with different scheduling times
         System.debug('CITIES TO PROCESS:' + citiesToProcess);
         fflib_SObjectUnitOfWork uow = new fflib_SObjectUnitOfWork(
             new Schema.SObjectType[] {
@@ -36,14 +31,12 @@ public with sharing class CitiesProcessor implements Schedulable{
 
         uow.commitWork();
         citiesToProcess.removeAll(processedCities);
-        scheduleNextBatch(citiesToProcess);
+        enqueueNextJob(citiesToProcess);
     }
 
-    public static void scheduleNextBatch(Set<String> citiesToProcess){
+    public static void enqueueNextJob(Set<String> citiesToProcess){
         if(!citiesToProcess.isEmpty()){
-            Datetime inAMinute = Datetime.now().addMinutes(1);//TODO: move this into metadata
-            String cron = inAMinute.second() + ' ' + inAMinute.minute() +' '+ inAMinute.hour() +' ' + inAMinute.day() + ' ' + inAMinute.month() + ' ? ' + inAMinute.year();
-            System.schedule('cities processor execution seed: ' + inAMinute.getTime(), cron, new CitiesProcessor(citiesToProcess));
+            System.enqueueJob(new CitiesProcessor(citiesToProcess));
         }
     }
 }

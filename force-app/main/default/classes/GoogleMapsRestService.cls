@@ -1,6 +1,15 @@
 public with sharing class GoogleMapsRestService {
-    private static final String ENDPOINT = 'https://maps.googleapis.com/maps/api/place/textsearch/json', API_KEY = 'AIzaSyAPBKH5HC67vSu_aU5Hlo8IfnzUb0B9bKs';//ideally we would use callout:NameOfTheNamedCredential with a named credential created. However, this does not seem to work sometimes, giving a credentials not found error.
-    private static final Integer GOOGLE_PAGE_NUMBER = 2, MIN_RECORD_COUNT_TO_RETURN = 100; //TODO: Move record count to custom setting. The number of tines google is able to show a next page property
+    private static Rest_Service_Config__mdt googleRestServiceConfig{
+        get{
+            if(googleRestServiceConfig == null){
+                googleRestServiceConfig = new RestServiceConfigsSelector().selectByDeveloperName(new Set<String>{'Google'})[0];
+            }
+
+            return googleRestServiceConfig;
+        }
+        set;
+    }
+    //TODO: review where to put this: ideally we would use callout:NameOfTheNamedCredential with a named credential created. However, this does not seem to work sometimes, giving a credentials not found error.
 
     public static GoogleResponse getSuppliersBasedOnCityName(String cityName){ 
         Map<String,String> googleParamList = new Map<String, String>{
@@ -8,7 +17,7 @@ public with sharing class GoogleMapsRestService {
         };
         
         GoogleResponse finalResponse = getMultiplePagesOfSuppliers(googleParamList);
-        while(finalResponse.results.size() < MIN_RECORD_COUNT_TO_RETURN){
+        while(finalResponse.results.size() < googleRestServiceConfig.Result_Number__c){
             getMoreSuppliersBasedOnBasedOnMinAndMaxCoordinates(finalResponse);
         }
 
@@ -73,7 +82,7 @@ public with sharing class GoogleMapsRestService {
             response.coordinatesAlreadyPresentInResultList.add(result.geometry.location.getCoordinates());
         }
 
-        for(Integer i = 0; i < GOOGLE_PAGE_NUMBER; i++){
+        for(Integer i = 0; i < googleRestServiceConfig.Page_Limit__c; i++){
             googleParamList.put('pagetoken', response.next_page_token);
             GoogleResponse nextPageResults = getSuppliers(googleParamList);
             response.next_page_token = nextPageResults.next_page_token;
@@ -87,7 +96,7 @@ public with sharing class GoogleMapsRestService {
     public static GoogleResponse getSuppliers(Map<String, String> urlParams){
         HttpRequest req = new HttpRequest();
         req.setMethod('GET');
-        String finalEndpoint = ENDPOINT + '?key=' + API_KEY;
+        String finalEndpoint = googleRestServiceConfig.Endpoint__c + '?key=' + googleRestServiceConfig.Api_Key__c;
         for(String param: urlParams.keySet()){
             String paramValue = urlParams.get(param);
             if(paramValue != null){
