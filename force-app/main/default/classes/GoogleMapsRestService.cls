@@ -1,5 +1,5 @@
 public with sharing class GoogleMapsRestService {
-    private static Rest_Service_Config__mdt googleRestServiceConfig{
+    public static Rest_Service_Config__mdt googleRestServiceConfig{
         get{
             if(googleRestServiceConfig == null){
                 googleRestServiceConfig = new RestServiceConfigsSelector().selectByDeveloperName(new Set<String>{'Google'})[0];
@@ -9,7 +9,6 @@ public with sharing class GoogleMapsRestService {
         }
         set;
     }
-    //TODO: review where to put this: ideally we would use callout:NameOfTheNamedCredential with a named credential created. However, this does not seem to work sometimes, giving a credentials not found error.
 
     public static GoogleResponse getSuppliersBasedOnCityName(String cityName){ 
         Map<String,String> googleParamList = new Map<String, String>{
@@ -65,7 +64,7 @@ public with sharing class GoogleMapsRestService {
         }
     }
 
-    public static GoogleResponse getSuppliersBasedOnALocation(Location locationToProcess){
+    private static GoogleResponse getSuppliersBasedOnALocation(Location locationToProcess){
         Map<String,String> googleParamList = new Map<String, String>{
             'query' => 'vehicle maintenance suppliers',
             'location' => locationToProcess.lat + ',' + locationToProcess.lng
@@ -74,7 +73,7 @@ public with sharing class GoogleMapsRestService {
         return getSuppliers(googleParamList);
     }
 
-    public static GoogleResponse getMultiplePagesOfSuppliers(Map<String, String> googleParamList){
+    private static GoogleResponse getMultiplePagesOfSuppliers(Map<String, String> googleParamList){
         GoogleResponse response = getSuppliers(googleParamList);
         response.coordinatesAlreadyPresentInResultList = new Set<String>();
         
@@ -93,10 +92,10 @@ public with sharing class GoogleMapsRestService {
         return response;
     }
     
-    public static GoogleResponse getSuppliers(Map<String, String> urlParams){
+    private static GoogleResponse getSuppliers(Map<String, String> urlParams){
         HttpRequest req = new HttpRequest();
         req.setMethod('GET');
-        String finalEndpoint = googleRestServiceConfig.Endpoint__c + '?key=' + googleRestServiceConfig.Api_Key__c;
+        String finalEndpoint = googleRestServiceConfig.Endpoint__c + '?key=' + googleRestServiceConfig.Api_Key__c; //Ideally we would use callout:NameOfTheNamedCredential with a named credential created. However, this does not seem to work sometimes, giving a credentials not found error.
         for(String param: urlParams.keySet()){
             String paramValue = urlParams.get(param);
             if(paramValue != null){
@@ -134,7 +133,7 @@ public with sharing class GoogleMapsRestService {
             }
         }
 
-        public void updateCoordinates(){
+        private void updateCoordinates(){
             for(GoogleResult result: results){
                 Location resultLocation = result.geometry.location;
                 if(minLatLocation == null || resultLocation.lat < minLatLocation.lat){
@@ -185,7 +184,7 @@ public with sharing class GoogleMapsRestService {
     public class Location{
         @AuraEnabled
         public Decimal lat, lng;
-        public String getCoordinates(){
+        private String getCoordinates(){
             return lat + '' + lng;
         }
     }
