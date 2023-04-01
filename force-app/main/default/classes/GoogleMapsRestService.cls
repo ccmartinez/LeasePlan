@@ -151,8 +151,6 @@ public with sharing class GoogleMapsRestService {
         @AuraEnabled
         public String name;
         @AuraEnabled
-        public CityCode plusCode;
-        @AuraEnabled
         public Geometry geometry;
 
         public Supplier__c createSupplier(String cityName){
@@ -181,10 +179,5 @@ public with sharing class GoogleMapsRestService {
         public String getCoordinates(){
             return lat + '' + lng;
         }
-    }
-
-    public class CityCode{
-        @AuraEnabled
-        public String compound_code;
     }
 }
