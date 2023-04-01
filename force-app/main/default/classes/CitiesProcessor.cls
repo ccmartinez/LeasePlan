@@ -5,7 +5,7 @@ public with sharing class CitiesProcessor implements Queueable, Database.AllowsC
     public CitiesProcessor(Set<String> citiesToProcess){
         this.citiesToProcess = citiesToProcess;
     }
-    public void execute(QueueableContext qc) {//TODO: test this with different scheduling times
+    public void execute(QueueableContext qc) {
         System.debug('CITIES TO PROCESS:' + citiesToProcess);
         fflib_SObjectUnitOfWork uow = new fflib_SObjectUnitOfWork(
             new Schema.SObjectType[] {
