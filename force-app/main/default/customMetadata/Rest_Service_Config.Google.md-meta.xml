@@ -8,7 +8,7 @@
     </values>
     <values>
         <field>Batch_size__c</field>
-        <value xsi:type="xsd:double">5.0</value>
+        <value xsi:type="xsd:double">3.0</value>
     </values>
     <values>
         <field>Endpoint__c</field>
@@ -21,5 +21,9 @@
     <values>
         <field>Result_Number__c</field>
         <value xsi:type="xsd:double">100.0</value>
+    </values>
+    <values>
+        <field>Time_difference__c</field>
+        <value xsi:type="xsd:double">90.0</value>
     </values>
 </CustomMetadata>
