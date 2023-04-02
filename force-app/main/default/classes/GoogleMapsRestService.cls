@@ -1,6 +1,14 @@
 public with sharing class GoogleMapsRestService {
-    private static final String ENDPOINT = 'https://maps.googleapis.com/maps/api/place/textsearch/json', API_KEY = 'AIzaSyAPBKH5HC67vSu_aU5Hlo8IfnzUb0B9bKs';//ideally we would use callout:NameOfTheNamedCredential with a named credential created. However, this does not seem to work sometimes, giving a credentials not found error.
-    private static final Integer GOOGLE_PAGE_NUMBER = 2, MIN_RECORD_COUNT_TO_RETURN = 100; //TODO: Move record count to custom setting. The number of tines google is able to show a next page property
+    public static Rest_Service_Config__mdt googleRestServiceConfig{
+        get{
+            if(googleRestServiceConfig == null){
+                googleRestServiceConfig = new RestServiceConfigsSelector().selectByDeveloperName(new Set<String>{'Google'})[0];
+            }
+
+            return googleRestServiceConfig;
+        }
+        set;
+    }
 
     public static GoogleResponse getSuppliersBasedOnCityName(String cityName){ 
         Map<String,String> googleParamList = new Map<String, String>{
@@ -8,7 +16,8 @@ public with sharing class GoogleMapsRestService {
         };
         
         GoogleResponse finalResponse = getMultiplePagesOfSuppliers(googleParamList);
-        while(finalResponse.results.size() < MIN_RECORD_COUNT_TO_RETURN){
+
+        while(finalResponse.results.size() < googleRestServiceConfig.Result_Number__c){
             getMoreSuppliersBasedOnBasedOnMinAndMaxCoordinates(finalResponse);
         }
 
@@ -56,7 +65,7 @@ public with sharing class GoogleMapsRestService {
         }
     }
 
-    public static GoogleResponse getSuppliersBasedOnALocation(Location locationToProcess){
+    private static GoogleResponse getSuppliersBasedOnALocation(Location locationToProcess){
         Map<String,String> googleParamList = new Map<String, String>{
             'query' => 'vehicle maintenance suppliers',
             'location' => locationToProcess.lat + ',' + locationToProcess.lng
@@ -65,7 +74,7 @@ public with sharing class GoogleMapsRestService {
         return getSuppliers(googleParamList);
     }
 
-    public static GoogleResponse getMultiplePagesOfSuppliers(Map<String, String> googleParamList){
+    private static GoogleResponse getMultiplePagesOfSuppliers(Map<String, String> googleParamList){
         GoogleResponse response = getSuppliers(googleParamList);
         response.coordinatesAlreadyPresentInResultList = new Set<String>();
         
@@ -73,7 +82,7 @@ public with sharing class GoogleMapsRestService {
             response.coordinatesAlreadyPresentInResultList.add(result.geometry.location.getCoordinates());
         }
 
-        for(Integer i = 0; i < GOOGLE_PAGE_NUMBER; i++){
+        for(Integer i = 0; i < googleRestServiceConfig.Page_Limit__c; i++){
             googleParamList.put('pagetoken', response.next_page_token);
             GoogleResponse nextPageResults = getSuppliers(googleParamList);
             response.next_page_token = nextPageResults.next_page_token;
@@ -84,10 +93,10 @@ public with sharing class GoogleMapsRestService {
         return response;
     }
     
-    public static GoogleResponse getSuppliers(Map<String, String> urlParams){
+    private static GoogleResponse getSuppliers(Map<String, String> urlParams){
         HttpRequest req = new HttpRequest();
         req.setMethod('GET');
-        String finalEndpoint = ENDPOINT + '?key=' + API_KEY;
+        String finalEndpoint = googleRestServiceConfig.Endpoint__c + '?key=' + googleRestServiceConfig.Api_Key__c; //Ideally we would use callout:NameOfTheNamedCredential with a named credential created. However, this does not seem to work sometimes, giving a credentials not found error.
         for(String param: urlParams.keySet()){
             String paramValue = urlParams.get(param);
             if(paramValue != null){
@@ -125,7 +134,12 @@ public with sharing class GoogleMapsRestService {
             }
         }
 
-        public void updateCoordinates(){
+        private void updateCoordinates(){
+            Decimal oldMinLat = minLatLocation?.lat; //If no results, amplify search no matter what
+            Decimal oldMinLng = minLongLocation?.lng;
+            Decimal oldMaxLat = maxLatLocation?.lat;
+            Decimal oldMaxLng = maxLatLocation?.lng;
+
             for(GoogleResult result: results){
                 Location resultLocation = result.geometry.location;
                 if(minLatLocation == null || resultLocation.lat < minLatLocation.lat){
@@ -144,6 +158,21 @@ public with sharing class GoogleMapsRestService {
                     maxLongLocation = resultLocation;
                 }
             }
+
+            if(minLatLocation?.lat != null && minLatLocation.lat == oldMinLat){
+                minLatLocation.lat -= 0.1;
+            }
+            if(minLongLocation?.lng != null && minLongLocation.lng == oldMinLng){
+                minLongLocation.lng -= 0.1;
+            }
+            if(maxLatLocation?.lat != null && maxLatLocation.lat == oldMaxLat){
+                maxLatLocation.lat += 0.1;
+            }
+            if(maxLongLocation?.lng != null && maxLongLocation.lng == oldMaxLng){
+                maxLongLocation.lng += 0.1;
+            }
+
+            System.debug('new min coordinates:' + minLatLocation.lat + ' ' + minLatLocation.lng + ' ' + minLongLocation.lat + ' ' + minLongLocation.lng);
         }
     }
 
@@ -151,13 +180,13 @@ public with sharing class GoogleMapsRestService {
         @AuraEnabled
         public String name;
         @AuraEnabled
-        public CityCode plusCode;
-        @AuraEnabled
         public Geometry geometry;
+
+        public GoogleResult(){}
 
         public Supplier__c createSupplier(String cityName){
             System.debug('CITY:' + cityName);
-            if(name.length() > 80){
+            if(name?.length() > 80){
                 name = name.substring(0, 80);
             }
 
@@ -178,13 +207,8 @@ public with sharing class GoogleMapsRestService {
     public class Location{
         @AuraEnabled
         public Decimal lat, lng;
-        public String getCoordinates(){
-            return lat + '' + lng;
+        private String getCoordinates(){
+            return lat + ' ' + lng;
         }
-    }
-
-    public class CityCode{
-        @AuraEnabled
-        public String compound_code;
     }
 }
