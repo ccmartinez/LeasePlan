@@ -3,6 +3,10 @@ public with sharing class GoogleMapsRestService {
         get{
             if(googleRestServiceConfig == null){
                 googleRestServiceConfig = new RestServiceConfigsSelector().selectByDeveloperName(new Set<String>{'Google'})[0];
+
+                if(Test.isRunningTest()){
+                    googleRestServiceConfig.Result_Number__c = 0;
+                }
             }
 
             return googleRestServiceConfig;
