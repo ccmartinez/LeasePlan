@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Cant_rate_case_not_closed</fullName>
+    <active>true</active>
+    <description>You can only rate a case after it has been closed</description>
+    <errorConditionFormula>OR(
+				AND(ISNEW(),
+								!ISBLANK(TEXT(Rating__c)) 
+				),
+    AND(
+								ISCHANGED(Rating__c), 
+								!ISPICKVAL(Status, &apos;Closed&apos;)
+    )
+)</errorConditionFormula>
+    <errorMessage>You can only rate a case after it has been closed</errorMessage>
+</ValidationRule>
