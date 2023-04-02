@@ -3,14 +3,16 @@
     <fullName>Cant_rate_case_not_closed</fullName>
     <active>true</active>
     <description>You can only rate a case after it has been closed</description>
-    <errorConditionFormula>OR(
-				AND(ISNEW(),
-								!ISBLANK(TEXT(Rating__c)) 
+    <errorConditionFormula>AND(
+				AND(
+								OR(
+
+												ISNEW(),
+												ISCHANGED(Rating__c)
+								), 
+								!ISBLANK(TEXT(Rating__c))
 				),
-    AND(
-								ISCHANGED(Rating__c), 
-								!ISPICKVAL(Status, &apos;Closed&apos;)
-    )
+				!ISPICKVAL(Status, &apos;Closed&apos;)
 )</errorConditionFormula>
     <errorMessage>You can only rate a case after it has been closed</errorMessage>
 </ValidationRule>
