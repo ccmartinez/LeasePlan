@@ -22,8 +22,4 @@
         <field>Result_Number__c</field>
         <value xsi:type="xsd:double">100.0</value>
     </values>
-    <values>
-        <field>Time_difference__c</field>
-        <value xsi:type="xsd:double">90.0</value>
-    </values>
 </CustomMetadata>

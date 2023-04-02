@@ -6,8 +6,7 @@ public with sharing class RestServiceConfigsSelector extends fflib_SObjectSelect
             Rest_Service_Config__mdt.Batch_size__c,
             Rest_Service_Config__mdt.Endpoint__c,
             Rest_Service_Config__mdt.Page_Limit__c,
-            Rest_Service_Config__mdt.Result_Number__c,
-            Rest_Service_Config__mdt.Time_difference__c 
+            Rest_Service_Config__mdt.Result_Number__c
         };
     }
 
