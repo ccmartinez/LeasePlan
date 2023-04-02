@@ -16,6 +16,7 @@ public with sharing class GoogleMapsRestService {
         };
         
         GoogleResponse finalResponse = getMultiplePagesOfSuppliers(googleParamList);
+
         while(finalResponse.results.size() < googleRestServiceConfig.Result_Number__c){
             getMoreSuppliersBasedOnBasedOnMinAndMaxCoordinates(finalResponse);
         }
@@ -134,6 +135,11 @@ public with sharing class GoogleMapsRestService {
         }
 
         private void updateCoordinates(){
+            Decimal oldMinLat = minLatLocation?.lat; //If no results, amplify search no matter what
+            Decimal oldMinLng = minLongLocation?.lng;
+            Decimal oldMaxLat = maxLatLocation?.lat;
+            Decimal oldMaxLng = maxLatLocation?.lng;
+
             for(GoogleResult result: results){
                 Location resultLocation = result.geometry.location;
                 if(minLatLocation == null || resultLocation.lat < minLatLocation.lat){
@@ -152,6 +158,21 @@ public with sharing class GoogleMapsRestService {
                     maxLongLocation = resultLocation;
                 }
             }
+
+            if(minLatLocation != null && minLatLocation.lat == oldMinLat){
+                minLatLocation.lat -= 0.1;
+            }
+            if(minLongLocation != null && minLongLocation.lng == oldMinLng){
+                minLongLocation.lng -= 0.1;
+            }
+            if(maxLatLocation != null && maxLatLocation.lat == oldMaxLat){
+                maxLatLocation.lat += 0.1;
+            }
+            if(maxLongLocation != null && maxLongLocation.lng == oldMaxLng){
+                maxLongLocation.lng += 0.1;
+            }
+
+            System.debug('new min coordinates:' + minLatLocation.lat + ' ' + minLatLocation.lng + ' ' + minLongLocation.lat + ' ' + minLongLocation.lng);
         }
     }
 
@@ -185,7 +206,7 @@ public with sharing class GoogleMapsRestService {
         @AuraEnabled
         public Decimal lat, lng;
         private String getCoordinates(){
-            return lat + '' + lng;
+            return lat + ' ' + lng;
         }
     }
 }

@@ -1,15 +1,10 @@
-public with sharing class CitiesProcessor implements Schedulable{
+public with sharing class CitiesProcessor implements Queueable, Database.AllowsCallouts{
     Set<String> citiesToProcess;
 
     public CitiesProcessor(Set<String> citiesToProcess){
         this.citiesToProcess = citiesToProcess;
     }
-    public void execute(SchedulableContext sc) {
-        processCities(citiesToProcess);
-    }
-
-    @future(Callout=true)
-    private static void processCities(Set<String> citiesToProcess){
+    public void execute(QueueableContext qc) {
         System.debug('CITIES TO PROCESS:' + citiesToProcess);
         fflib_SObjectUnitOfWork uow = new fflib_SObjectUnitOfWork(
             new Schema.SObjectType[] {
@@ -35,41 +30,12 @@ public with sharing class CitiesProcessor implements Schedulable{
 
         uow.commitWork();
         citiesToProcess.removeAll(processedCities);
-        scheduleNextBatch(citiesToProcess);
+        enqueueNextBatch(citiesToProcess);
     }
 
-    public static void scheduleNextBatch(Set<String> citiesToProcess){
+    public static void enqueueNextBatch(Set<String> citiesToProcess){
         if(!citiesToProcess.isEmpty()){
-            Account[] accs = new AccountsSelector().getAccountsUsedForThreadSync();
-            Datetime nextJobDt = getNextJobDt();
-
-            System.debug('next job dt: ' + nextJobDt);
-            String cron = nextJobDt.second() + ' ' + nextJobDt.minute() +' '+ nextJobDt.hour() +' ' + nextJobDt.day() + ' ' + nextJobDt.month() + ' ? ' + nextJobDt.year();
-            System.schedule('CitiesProcessor execution time #' + JSON.serialize(nextJobDt), cron, new CitiesProcessor(citiesToProcess));
-        }
-    }
-
-    private static Datetime getNextJobDt(){
-        Integer timeDifference = Integer.valueOf(GoogleMapsRestService.googleRestServiceConfig.Time_difference__c);
-        Datetime now = Datetime.now();
-        Datetime nextExecutionTimeWithNoPreviousJobsTakenIntoAccount = now.addSeconds(20);
-        Datetime nextJobDt;
-        CronTrigger[] lastExecutedJob = new CronTriggersSelector().getLastJobContainingProvidedName('CitiesProcessor execution');
-
-        if(lastExecutedJob.isEmpty()){
-            System.debug('next execution time: ' + nextExecutionTimeWithNoPreviousJobsTakenIntoAccount);
-            return nextExecutionTimeWithNoPreviousJobsTakenIntoAccount;
-        }
-        else{
-            System.debug('last executed job: ' + lastExecutedJob[0]);
-            Datetime lastJobDt = lastExecutedJob[0].NextFireTime == null ? lastExecutedJob[0].PreviousFireTime : lastExecutedJob[0].NextFireTime;
-            System.debug('last job dt: ' + lastJobDt);
-            Datetime lastJobWithTimeDiff = lastJobDt.addSeconds(timeDifference);
-            if(lastJobWithTimeDiff > now){
-                return lastJobWithTimeDiff;
-            }
-            
-            return nextExecutionTimeWithNoPreviousJobsTakenIntoAccount;
+            System.enqueueJob(new CitiesProcessor(citiesToProcess));
         }
     }
 }

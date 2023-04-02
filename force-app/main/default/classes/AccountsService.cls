@@ -3,7 +3,7 @@ public with sharing class AccountsService {
         Set<String> accountCitiesThatDontHaveASupplier = getAccountCitiesThatDontHaveASupplier();
         System.debug('accountCitiesThatDontHaveASupplier:' + accountCitiesThatDontHaveASupplier);
         
-        CitiesProcessor.scheduleNextBatch(accountCitiesThatDontHaveASupplier);//cant do callouts from trigger so it is necessary to initiate another flow
+        CitiesProcessor.enqueueNextBatch(accountCitiesThatDontHaveASupplier);//cant do callouts from trigger so it is necessary to initiate another flow
     }
 
     private Set<String> getAccountCitiesThatDontHaveASupplier(){
