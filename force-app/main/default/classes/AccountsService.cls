@@ -21,7 +21,7 @@ public with sharing class AccountsService {
             accountCitiesThatDontHaveASupplier.remove(supplier.Location__City__s);
         }
 
-        System.debug('changedAccountCitiesThatMayHaveASupplier:' + changedAccountCitiesThatMayHaveASupplier);
+        System.debug('accountCitiesThatDontHaveASupplier:' + accountCitiesThatDontHaveASupplier);
         return accountCitiesThatDontHaveASupplier;
     }
 }
