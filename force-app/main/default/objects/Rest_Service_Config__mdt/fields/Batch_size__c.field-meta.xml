@@ -3,7 +3,7 @@
     <fullName>Batch_size__c</fullName>
     <description>The number of records that will be processed in a single execution.</description>
     <externalId>false</externalId>
-    <fieldManageability>DeveloperControlled</fieldManageability>
+    <fieldManageability>SubscriberControlled</fieldManageability>
     <label>Batch size</label>
     <precision>3</precision>
     <required>true</required>
