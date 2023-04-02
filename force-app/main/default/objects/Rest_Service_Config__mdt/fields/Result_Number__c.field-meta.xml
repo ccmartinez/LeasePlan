@@ -3,7 +3,7 @@
     <fullName>Result_Number__c</fullName>
     <description>The minimum amount of results to retreive from the rest service</description>
     <externalId>false</externalId>
-    <fieldManageability>DeveloperControlled</fieldManageability>
+    <fieldManageability>SubscriberControlled</fieldManageability>
     <label>Result Number</label>
     <precision>4</precision>
     <required>true</required>
