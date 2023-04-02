@@ -159,16 +159,16 @@ public with sharing class GoogleMapsRestService {
                 }
             }
 
-            if(minLatLocation != null && minLatLocation.lat == oldMinLat){
+            if(minLatLocation?.lat != null && minLatLocation.lat == oldMinLat){
                 minLatLocation.lat -= 0.1;
             }
-            if(minLongLocation != null && minLongLocation.lng == oldMinLng){
+            if(minLongLocation?.lng != null && minLongLocation.lng == oldMinLng){
                 minLongLocation.lng -= 0.1;
             }
-            if(maxLatLocation != null && maxLatLocation.lat == oldMaxLat){
+            if(maxLatLocation?.lat != null && maxLatLocation.lat == oldMaxLat){
                 maxLatLocation.lat += 0.1;
             }
-            if(maxLongLocation != null && maxLongLocation.lng == oldMaxLng){
+            if(maxLongLocation?.lng != null && maxLongLocation.lng == oldMaxLng){
                 maxLongLocation.lng += 0.1;
             }
 
@@ -182,9 +182,11 @@ public with sharing class GoogleMapsRestService {
         @AuraEnabled
         public Geometry geometry;
 
+        public GoogleResult(){}
+
         public Supplier__c createSupplier(String cityName){
             System.debug('CITY:' + cityName);
-            if(name.length() > 80){
+            if(name?.length() > 80){
                 name = name.substring(0, 80);
             }
 
