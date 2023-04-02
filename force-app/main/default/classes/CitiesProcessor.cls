@@ -30,10 +30,10 @@ public with sharing class CitiesProcessor implements Queueable, Database.AllowsC
 
         uow.commitWork();
         citiesToProcess.removeAll(processedCities);
-        enqueueNextJob(citiesToProcess);
+        enqueueNextBatch(citiesToProcess);
     }
 
-    public static void enqueueNextJob(Set<String> citiesToProcess){
+    public static void enqueueNextBatch(Set<String> citiesToProcess){
         if(!citiesToProcess.isEmpty()){
             System.enqueueJob(new CitiesProcessor(citiesToProcess));
         }

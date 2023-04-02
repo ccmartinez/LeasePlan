@@ -32,7 +32,8 @@ export default class SuppliersMap extends LightningElement {
                         location: {
                             Latitude: parseFloat(resultLocation.lat),
                             Longitude: parseFloat(resultLocation.lng)
-                        }
+                        },
+                        description: resultLocation.lat + ', ' + resultLocation.lng
                     })
                 });
 
@@ -42,18 +43,17 @@ export default class SuppliersMap extends LightningElement {
             }catch(error){
                 this.processError(error)
             }
-        }).catch(error => this.processError(error));;
+        }).catch(error => this.processError(error));
     }
 
-    toggleSuppliersVisibility(){
-        if(this.supplierListVisibility == 'hidden'){
-            this.supplierListVisibility = 'visible';
-            this.showSupplierListButton = false;
-        }
-        else{
-            this.supplierListVisibility = 'hidden'
-            this.showSupplierListButton = true;
-        }
+    enableSuppliersVisibility(){
+        this.supplierListVisibility = 'visible';
+        this.showSupplierListButton = false;
+    }
+
+    disableSuppliersVisibility(){
+        this.supplierListVisibility = 'hidden'
+        this.showSupplierListButton = true;
     }
 
     processError(error){
