@@ -104,7 +104,7 @@ public with sharing class GoogleMapsRestService {
         GoogleResponse response = getSuppliers(googleParamList);
         response.coordinatesAlreadyPresentInResultList = new Set<String>();
         
-        for(GoogleResult result: response.results){
+        for(GoogleResult result: response.results){ //Add the coordinates already received in the last response to the history of coordinates of the result
             response.coordinatesAlreadyPresentInResultList.add(result.geometry.location.getCoordinates());
         }
 
