@@ -1,10 +1,15 @@
-public with sharing class CitiesProcessor implements Queueable, Database.AllowsCallouts{
+public with sharing class CitiesProcessor implements Queueable{
     Set<String> citiesToProcess;
 
     public CitiesProcessor(Set<String> citiesToProcess){
         this.citiesToProcess = citiesToProcess;
     }
     public void execute(QueueableContext qc) {
+        processCities(citiesToProcess);
+    }
+
+    @future(Callout=true)
+    public static void processCities(Set<String> citiesToProcess){
         fflib_SObjectUnitOfWork uow = new fflib_SObjectUnitOfWork(
             new Schema.SObjectType[] {
                 Supplier__c.SObjectType

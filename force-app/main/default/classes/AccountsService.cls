@@ -9,7 +9,7 @@ public with sharing class AccountsService {
         Set<String> changedAccountCitiesThatMayHaveASupplier = new Set<String>();
         for(Account acc: (Account[])Trigger.new){
             if(acc.BillingCity != null){
-                changedAccountCitiesThatMayHaveASupplier.add(acc.BillingCity);
+                changedAccountCitiesThatMayHaveASupplier.add(acc.BillingCity.toUpperCase());
             }
         }
 
