@@ -1,5 +1,10 @@
 @isTest
-public with sharing class AccountsServiceTest {
+public with sharing class AccountsServiceTest implements Queueable{
+    Account a;
+    public AccountsServiceTest(Account a){
+        this.a = a;
+    }
+
     @isTest static void processAccountCities(){
         GoogleMapsRestService.googleRestServiceConfig.Result_Number__c = 1;
         Test.setMock(HttpCalloutMock.class, new HttpMockClass());
@@ -10,9 +15,13 @@ public with sharing class AccountsServiceTest {
         Test.startTest();
         insert a;
         Test.stopTest();
-        update a; //Ignore accounts that already have a supplier created, so 2 different inserts are required
+        update a; //Ignore accounts tha t already have a supplier created, so 2 different inserts are required
 
-        Assert.areEqual(a.BillingCity, [SELECT Location__City__s FROM Supplier__c].Location__City__s);
+        System.enqueueJob(new AccountsServiceTest(a));
+    }
+
+    public void execute(QueueableContext qc){ //Wait until future methods finish executing
+        Assert.areEqual(a.BillingCity.toUpperCase(), [SELECT Location__City__s FROM Supplier__c].Location__City__s);
     }
 
     public class HttpMockClass implements HttpCalloutMock{

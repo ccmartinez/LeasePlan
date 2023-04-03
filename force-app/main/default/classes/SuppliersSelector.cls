@@ -15,6 +15,10 @@ public with sharing class SuppliersSelector extends fflib_SObjectSelector{
 	}
 
     public Supplier__c[] selectByCity(Set<String> supplierCities){
+        for(String supplierCity: supplierCities){
+            supplierCity = supplierCity.toUpperCase();
+        }
+        
         fflib_QueryFactory queryFactory = newQueryFactory();
         return (Supplier__c[]) Database.query(queryFactory.setCondition('Location__City__s IN :supplierCities').toSoql());
     }
