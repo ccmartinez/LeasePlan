@@ -1,24 +1,11 @@
 public with sharing class CasesSelector extends fflib_SObjectSelector{
     Map<String, Schema.SobjectField> fieldMap;
 
-    public String[] getFieldList(){
-        return new String[]{'AccountId'};
-    }
-
     public List<Schema.SObjectField> getSObjectFieldList()
-    {
-        if(fieldMap == null){
-            fieldMap = Case.SObjectType.getDescribe().fields.getMap();
-        }
-
-        String[] fieldList = getFieldList();
-        Schema.SObjectField[] listToReturn = new Schema.SObjectField[0];
-
-        for(String field: fieldList){
-            listToReturn.add(fieldMap.get(field));
-        }
-
-        return listToReturn;
+    {   
+        return new Schema.SObjectField[]{
+            Case.AccountId
+        };
     }
 
     public Schema.SObjectType getSObjectType()
@@ -26,12 +13,14 @@ public with sharing class CasesSelector extends fflib_SObjectSelector{
         return Case.SObjectType;
     }
 
+    /**
+     * @author Carlos Cañizares
+     * Generates a map that links every account to the average rating of all the cases of that same account
+     */
     public Map<Id, Decimal> getAccountIdToAverageCaseRating(Set<Id> accountIds){
         fflib_QueryFactory queryFactory = newQueryFactory();
 
-        String queryToLaunch = 'SELECT ' + String.join(
-            getFieldList(), ', '
-        ) + ', AVG(Rating_Value__c) rating FROM ' + getSObjectType() + ' WHERE AccountId IN :accountIds AND Rating_Value__c != null GROUP BY AccountId';
+        String queryToLaunch = 'SELECT AccountId, AVG(Rating_Value__c) rating FROM ' + getSObjectType() + ' WHERE AccountId IN :accountIds AND Rating_Value__c != null GROUP BY AccountId';
         AggregateResult[] results = Database.query(queryToLaunch);
         Map<Id, Decimal> accountIdToAverageRating = new Map<Id, Decimal>();
         for(AggregateResult result: results){

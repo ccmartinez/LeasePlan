@@ -1,4 +1,8 @@
 public with sharing class CasesService {
+    /**
+     * @author Carlos Cañizares
+     * Recalculate the average rating of the account of every case that has been closed
+     */
     public void processCasesStatuses(Map<Id, SObject> oldMap) {
         Case[] casesToProcess = new Case[0];
 

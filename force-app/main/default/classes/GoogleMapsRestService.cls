@@ -14,6 +14,12 @@ public with sharing class GoogleMapsRestService {
         set;
     }
 
+    /**
+     * @author Carlos Cañizares
+     * Sends a request to google maps of the vehicle suppliers that are near the provided city name, it is not possible to process multiple cities at the same time 
+     * since google maps does not support a list of cities. If the results do not match the desired results, more searches are done based on the specified amount of results
+     * that are expected from the service.
+     */
     public static GoogleResponse getSuppliersBasedOnCityName(String cityName){ 
         Map<String,String> googleParamList = new Map<String, String>{
             'query' => 'vehicle maintenance suppliers near ' + cityName
@@ -28,6 +34,10 @@ public with sharing class GoogleMapsRestService {
         return finalResponse;
     }
 
+    /**
+     * @author Carlos Cañizares
+     * Analizes the response to only add the results which coordinates were not present already in the result list
+     */
     private static void addNonDuplicateResultsToResponse(GoogleResponse response, GoogleResult[] results){
         if(response.coordinatesAlreadyPresentInResultList == null){
             response.coordinatesAlreadyPresentInResultList = new Set<String>();
@@ -43,6 +53,10 @@ public with sharing class GoogleMapsRestService {
         }
     }
 
+    /**
+     * @author Carlos Cañizares
+     * Analizes the response to update the maximum and minimum latitude and longitude that will be used for future searches based on locations
+     */
     private static void getMoreSuppliersBasedOnBasedOnMinAndMaxCoordinates(GoogleResponse currentResponse){
         currentResponse.updateCoordinates();
 
@@ -52,6 +66,10 @@ public with sharing class GoogleMapsRestService {
         updateSuppliersBasedOnALocation(currentResponse, currentResponse.maxLongLocation);
     }
 
+    /**
+     * @author Carlos Cañizares
+     * Sends a request to google maps of the vehicle suppliers that are near the provided coordinates, and only the results which coordinates were not present in previous searches are now added
+     */
     private static void updateSuppliersBasedOnALocation(GoogleResponse currentResponse, Location location){
         if(currentResponse.coordinatesAlreadyUsedInASearch == null){
             currentResponse.coordinatesAlreadyUsedInASearch = new Set<String>();
@@ -65,6 +83,10 @@ public with sharing class GoogleMapsRestService {
         }
     }
 
+    /**
+     * @author Carlos Cañizares
+     * Sends a request to google maps of the vehicle suppliers that are near the provided coordinates
+     */
     private static GoogleResponse getSuppliersBasedOnALocation(Location locationToProcess){
         Map<String,String> googleParamList = new Map<String, String>{
             'query' => 'vehicle maintenance suppliers',
@@ -74,6 +96,10 @@ public with sharing class GoogleMapsRestService {
         return getSuppliers(googleParamList);
     }
 
+    /**
+     * @author Carlos Cañizares
+     * Sends multiple requests to google maps using it's paginator service, until no more pages are available
+     */
     private static GoogleResponse getMultiplePagesOfSuppliers(Map<String, String> googleParamList){
         GoogleResponse response = getSuppliers(googleParamList);
         response.coordinatesAlreadyPresentInResultList = new Set<String>();
@@ -93,6 +119,10 @@ public with sharing class GoogleMapsRestService {
         return response;
     }
     
+    /**
+     * @author Carlos Cañizares
+     * Calls the google maps api with the provided parameters
+     */
     private static GoogleResponse getSuppliers(Map<String, String> urlParams){
         HttpRequest req = new HttpRequest();
         req.setMethod('GET');
@@ -110,6 +140,10 @@ public with sharing class GoogleMapsRestService {
         return parsedResponse;
     }
 
+    /**
+     * @author Carlos Cañizares
+     * Wrapper of the response from google, some custom fields were added to be used when processing the response
+     */
     public class GoogleResponse{
         private String next_page_token;
         private Set<String> coordinatesAlreadyPresentInResultList, coordinatesAlreadyUsedInASearch;
@@ -130,8 +164,12 @@ public with sharing class GoogleMapsRestService {
             }
         }
 
+        /**
+         * @author Carlos Cañizares
+         * In the case one of the 4 coordinates used in future searches (minimum and maximum latitude and longitude) remains the same becase no new records were found with lower or higher coordinates, the provided coordinate is manually increased to avoid an infinite loop
+         */
         private void updateCoordinates(){
-            Decimal oldMinLat = minLatLocation?.lat; //If no results, amplify search no matter what
+            Decimal oldMinLat = minLatLocation?.lat;
             Decimal oldMinLng = minLongLocation?.lng;
             Decimal oldMaxLat = maxLatLocation?.lat;
             Decimal oldMaxLng = maxLatLocation?.lng;
@@ -178,7 +216,11 @@ public with sharing class GoogleMapsRestService {
         public Geometry geometry;
 
         public GoogleResult(){}
-
+        
+        /**
+         * @author Carlos Cañizares
+         * Generates a supplier with the data of the result from google
+         */
         public Supplier__c createSupplier(String cityName){
             if(name?.length() > 80){
                 name = name.substring(0, 80);

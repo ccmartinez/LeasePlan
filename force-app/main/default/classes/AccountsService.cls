@@ -1,4 +1,9 @@
 public with sharing class AccountsService {
+
+    /**
+     * @author Carlos Cañizares
+     * Generates suppliers for every billing city from the accounts that does not have any
+     */
     public void processAccountCities(){
         Set<String> accountCitiesThatDontHaveASupplier = getAccountCitiesThatDontHaveASupplier();
         
@@ -22,6 +27,10 @@ public with sharing class AccountsService {
         return accountCitiesThatDontHaveASupplier;
     }
 
+    /**
+     * @author Carlos Cañizares
+     * Updates the average ratings of the accounts that are related to the provided cases
+     */
     public void updateAccountsRatings(Case[] closedCases){
         if(closedCases != null && !closedCases.isEmpty()){
             Account[] accountsToUpdate = new Account[0];

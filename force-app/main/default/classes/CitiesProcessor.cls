@@ -4,10 +4,14 @@ public with sharing class CitiesProcessor implements Queueable{
     public CitiesProcessor(Set<String> citiesToProcess){
         this.citiesToProcess = citiesToProcess;
     }
-    public void execute(QueueableContext qc) {
+    public void execute(QueueableContext qc) { //We use Queueable context and future methods to be able to chain an unlimited amount of jobs in the case of a masive amount of different cities dml;
         processCities(citiesToProcess);
     }
 
+    /**
+     * @author Carlos Cañizares
+     * Generates suppliers for every city provided that does not have any
+     */
     @future(Callout=true)
     public static void processCities(Set<String> citiesToProcess){
         fflib_SObjectUnitOfWork uow = new fflib_SObjectUnitOfWork(
