@@ -10,7 +10,6 @@ public with sharing class CitiesProcessor implements Queueable{
 
     @future(Callout=true)
     public static void processCities(Set<String> citiesToProcess){
-        System.debug('CITIES TO PROCESS:' + citiesToProcess);
         fflib_SObjectUnitOfWork uow = new fflib_SObjectUnitOfWork(
             new Schema.SObjectType[] {
                 Supplier__c.SObjectType
@@ -19,11 +18,9 @@ public with sharing class CitiesProcessor implements Queueable{
         
         Set<String> processedCities = new Set<String>();
         for(String cityName: citiesToProcess){
-            System.debug('INITIAL CITY:' + cityName);
             GoogleMapsRestService.GoogleResponse response = GoogleMapsRestService.getSuppliersBasedOnCityName(cityName);
             for(GoogleMapsRestService.GoogleResult result: response.results){
                 Supplier__c supplierToCreate = result.createSupplier(cityName);
-                System.debug('supplier name: ' + supplierToCreate.Name);
                 uow.registerNew(supplierToCreate);
             }
             

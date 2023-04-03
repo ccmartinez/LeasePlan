@@ -10,7 +10,6 @@ public with sharing class SuppliersMapController {
             suppliers = new SuppliersSelector().selectByCity(new Set<String>{accountToProcess.BillingCity.toUpperCase()});
         }
 
-        System.debug(suppliers);
         return new GoogleMapsRestService.GoogleResponse(suppliers);
     }
 }
