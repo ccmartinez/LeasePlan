@@ -22,7 +22,6 @@ export default class SuppliersMap extends LightningElement {
     }
 
     retreiveData(){
-        debugger;
         getSuppliersData({accountId: this.recordId}).then(response => {
             try{
                 response.results.forEach(result => {

@@ -1,7 +1,6 @@
 public with sharing class AccountsService {
     public void processAccountCities(){
         Set<String> accountCitiesThatDontHaveASupplier = getAccountCitiesThatDontHaveASupplier();
-        System.debug('accountCitiesThatDontHaveASupplier:' + accountCitiesThatDontHaveASupplier);
         
         CitiesProcessor.enqueueNextBatch(accountCitiesThatDontHaveASupplier);//cant do callouts from trigger so it is necessary to initiate another flow
     }
@@ -13,7 +12,6 @@ public with sharing class AccountsService {
                 changedAccountCitiesThatMayHaveASupplier.add(acc.BillingCity);
             }
         }
-        System.debug('changedAccountCitiesThatMayHaveASupplier:' + changedAccountCitiesThatMayHaveASupplier);
 
         Set<String> accountCitiesThatDontHaveASupplier = changedAccountCitiesThatMayHaveASupplier.clone();
         Supplier__c[] suppliersOfAccountCities = new SuppliersSelector().selectByCity(changedAccountCitiesThatMayHaveASupplier);
@@ -21,7 +19,6 @@ public with sharing class AccountsService {
             accountCitiesThatDontHaveASupplier.remove(supplier.Location__City__s);
         }
 
-        System.debug('accountCitiesThatDontHaveASupplier:' + accountCitiesThatDontHaveASupplier);
         return accountCitiesThatDontHaveASupplier;
     }
 
