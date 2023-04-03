@@ -33,15 +33,11 @@ public with sharing class GoogleMapsRestService {
             response.coordinatesAlreadyPresentInResultList = new Set<String>();
         }
 
-        System.debug('result token:' + response.next_page_token);
         for(GoogleResult result: results){
             Location resultLocation = result.geometry.location;
             String resultCoordinates = resultLocation.getCoordinates();
-            System.debug('result coordinates:' + resultCoordinates);
             if(!response.coordinatesAlreadyPresentInResultList.contains(resultCoordinates)){
-                System.debug('new coordinates');
                 response.coordinatesAlreadyPresentInResultList.add(resultCoordinates);
-                System.debug('name to add:' + result.name);
                 response.results.add(result);
             }
         }
@@ -104,12 +100,10 @@ public with sharing class GoogleMapsRestService {
         for(String param: urlParams.keySet()){
             String paramValue = urlParams.get(param);
             if(paramValue != null){
-                System.debug('param:' + param + ' | ' + urlParams.get(param));
                 finalEndpoint += '&' + param + '=' + EncodingUtil.urlEncode(urlParams.get(param), 'UTF-8'); //parameters do not seem to work in the header, so we have to pass them in the endpoint
             }
         }
-        
-        System.debug('final endpoint:' + finalEndpoint);
+
         req.setEndpoint(finalEndpoint);
         String response = new Http().send(req).getBody();
         GoogleResponse parsedResponse = (GoogleResponse)JSON.deserialize(response, GoogleResponse.class);
@@ -133,7 +127,6 @@ public with sharing class GoogleMapsRestService {
                 resultToAdd.geometry.location.lat = supplier.Location__Latitude__s;
                 resultToAdd.geometry.location.lng = supplier.Location__Longitude__s;
                 resultToAdd.name = supplier.Name;
-                System.debug('name to add:' + resultToAdd.name);
                 results.add(resultToAdd);
             }
         }
@@ -176,7 +169,6 @@ public with sharing class GoogleMapsRestService {
                 maxLongLocation.lng += 0.1;
             }
 
-            System.debug('new min coordinates:' + minLatLocation.lat + ' ' + minLatLocation.lng + ' ' + minLongLocation.lat + ' ' + minLongLocation.lng);
         }
     }
 
@@ -189,7 +181,6 @@ public with sharing class GoogleMapsRestService {
         public GoogleResult(){}
 
         public Supplier__c createSupplier(String cityName){
-            System.debug('CITY:' + cityName);
             if(name?.length() > 80){
                 name = name.substring(0, 80);
             }

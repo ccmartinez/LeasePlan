@@ -33,8 +33,6 @@ public with sharing class GoogleMapsRestServiceTest {
         Integer callCount = 0;
         public HTTPResponse respond(HTTPRequest req) {
 
-            System.debug('call count:' + callCount);
-            System.debug('page limit:' + GoogleMapsRestService.googleRestServiceConfig.Page_Limit__c);
             Supplier__c[] supplierList = new Supplier__c[]{new Supplier__c(Location__Latitude__s = 1, Location__Longitude__s = 1)};
             if(++callCount > GoogleMapsRestService.googleRestServiceConfig.Page_Limit__c + 1){
                 supplierList.add(new Supplier__c(Location__Latitude__s = 2, Location__Longitude__s = 2));
