@@ -103,7 +103,6 @@ public with sharing class GoogleMapsRestService {
                 finalEndpoint += '&' + param + '=' + EncodingUtil.urlEncode(urlParams.get(param), 'UTF-8'); //parameters do not seem to work in the header, so we have to pass them in the endpoint
             }
         }
-        
         req.setEndpoint(finalEndpoint);
         String response = new Http().send(req).getBody();
         GoogleResponse parsedResponse = (GoogleResponse)JSON.deserialize(response, GoogleResponse.class);
